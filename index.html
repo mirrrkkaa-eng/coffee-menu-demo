@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4b2e1e">
+  <title>Название кофейни</title>
+
+  <!-- ============================================================
+       НАСТРОЙКИ. Здесь меняются название, ссылки, график и меню.
+       Больше нигде в файле ничего править не нужно.
+       ============================================================ -->
+  <script>
+    const SETTINGS = {
+      name: "Название кофейни",
+      slogan: "Свежий кофе в двух шагах от моря",
+
+      // Номер для WhatsApp: только цифры, без плюса и пробелов
+      whatsapp: "79000000000",
+      // Ссылка на Telegram
+      telegram: "https://t.me/your_name",
+      // Телефон для кнопки «Позвонить»: с плюсом, без пробелов
+      phone: "+79000000000",
+
+      about: "Мы небольшая кофейня в Анапе. Варим кофе из свежеобжаренных зёрен и печём десерты каждое утро. Заходите на чашечку по пути к морю или на работу.",
+
+      address: "г. Анапа, ул. Примерная, 1",
+      // График: [дни, часы]. Можно добавлять и удалять строки
+      hours: [
+        ["Пн–Пт", "8:00–21:00"],
+        ["Сб–Вс", "9:00–22:00"]
+      ],
+      // Ссылка на карту (в Яндекс Картах или Google Картах нажми «Поделиться»)
+      mapLink: "https://yandex.ru/maps/"
+    };
+
+    // Меню: категории и позиции. Можно менять названия и цены (число без ₽),
+    // добавлять и удалять позиции. Описание (desc) можно убрать.
+    const MENU = [
+      {
+        category: "Кофе",
+        items: [
+          { name: "Эспрессо", price: 150 },
+          { name: "Американо", price: 170 },
+          { name: "Капучино", price: 220, desc: "Классика, 250 мл" },
+          { name: "Латте", price: 240, desc: "Нежный, с молочной пенкой" },
+          { name: "Раф", price: 280 }
+        ]
+      },
+      {
+        category: "Чай",
+        items: [
+          { name: "Чёрный чай", price: 150 },
+          { name: "Зелёный чай", price: 150 },
+          { name: "Облепиховый чай", price: 230, desc: "С мёдом" }
+        ]
+      },
+      {
+        category: "Десерты",
+        items: [
+          { name: "Круассан", price: 160 },
+          { name: "Чизкейк", price: 250 },
+          { name: "Булочка с маком", price: 130 }
+        ]
+      }
+    ];
+  </script>
+
+  <style>
+    :root {
+      --bg: #fff8f0;
+      --card: #ffffff;
+      --dark: #4b2e1e;
+      --darker: #3a2216;
+      --text: #3b2a20;
+      --muted: #6f5646;
+      --line: #e5d3c0;
+      --accent: #f3c98b;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ---------- Кнопки ---------- */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 0 24px;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:focus-visible, .round-btn:focus-visible, .footer-links a:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .btn-primary { background: var(--accent); color: var(--darker); }
+    .btn-outline { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.75); }
+    .btn-dark { background: var(--dark); color: #fff; }
+    .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+
+    /* ---------- Первый экран ---------- */
+    .hero {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+      text-align: center;
+      color: #fff;
+      background: radial-gradient(circle at 50% 0%, #6b4430 0%, #4b2e1e 55%, #3a2216 100%);
+    }
+    .hero-icon { font-size: 56px; line-height: 1; }
+    .hero h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(32px, 8vw, 56px);
+      line-height: 1.15;
+    }
+    .hero p {
+      margin: 0 0 28px;
+      max-width: 30ch;
+      font-size: clamp(18px, 4.5vw, 22px);
+      color: #f3e3d0;
+    }
+    .hero-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 360px;
+    }
+    @media (min-width: 700px) {
+      .hero-buttons { flex-direction: row; width: auto; max-width: none; }
+    }
+
+    /* ---------- Разделы ---------- */
+    .section {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px 16px;
+    }
+    .section h2 {
+      margin: 0 0 16px;
+      font-size: 28px;
+      color: var(--dark);
+    }
+    .badge {
+      margin-left: 8px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+    }
+    .card h3 {
+      margin: 12px 0 4px;
+      font-size: 20px;
+      color: var(--dark);
+    }
+
+    /* ---------- Меню ---------- */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-name { flex: 1; min-width: 0; }
+    .menu-desc { display: block; font-size: 14px; color: var(--muted); }
+    .menu-price { font-weight: 700; white-space: nowrap; }
+    .round-btn {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 50%;
+      background: var(--dark);
+      color: #fff;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .round-btn:active { transform: scale(0.92); }
+
+    /* ---------- Заказ ---------- */
+    .order-card { padding: 16px; }
+    .empty { margin: 0; color: var(--muted); }
+    .cart-list { list-style: none; margin: 0; padding: 0; }
+    .cart-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .cart-name { grid-column: 1 / -1; font-weight: 600; }
+    .qty { display: flex; align-items: center; gap: 12px; }
+    .qty .round-btn { width: 40px; height: 40px; font-size: 22px; }
+    .qty-num { min-width: 24px; text-align: center; font-weight: 700; }
+    .cart-sum { font-weight: 700; }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .order-actions { display: flex; flex-direction: column; gap: 12px; }
+    .btn-link {
+      background: none;
+      border: none;
+      min-height: 44px;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--muted);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* ---------- Как нас найти ---------- */
+    .where-address { margin: 12px 0; font-size: 18px; }
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .hours-row:last-child { border-bottom: none; }
+    .where-card { padding-bottom: 16px; }
+    .where-card .btn { margin-top: 8px; }
+
+    /* ---------- Подвал ---------- */
+    footer {
+      padding: 32px 16px;
+      text-align: center;
+      color: #fff;
+      background: var(--dark);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 20px;
+      margin-bottom: 12px;
+    }
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .footer-copy { margin: 0; font-size: 14px; color: #e5d3c0; }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-icon">☕</div>
+    <h1 data-fill="name"></h1>
+    <p id="slogan"></p>
+    <div class="hero-buttons">
+      <a class="btn btn-primary" data-link="whatsapp" target="_blank" rel="noopener">Написать в WhatsApp</a>
+      <a class="btn btn-outline" data-link="telegram" target="_blank" rel="noopener">Написать в Telegram</a>
+      <a class="btn btn-outline" data-link="phone">Позвонить</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="menu">
+      <h2>Меню <span class="badge">пример</span></h2>
+      <div id="menu-root"></div>
+    </section>
+
+    <section class="section" id="order">
+      <h2>Ваш заказ</h2>
+      <div class="card order-card">
+        <p class="empty" id="cart-empty">Пока пусто. Нажмите «+» рядом с любой позицией меню.</p>
+        <ul class="cart-list" id="cart-list"></ul>
+        <div id="cart-footer" hidden>
+          <div class="total-row"><span>Итого</span><span id="total">0 ₽</span></div>
+          <div class="order-actions">
+            <a class="btn btn-primary" id="send-order" target="_blank" rel="noopener">Отправить заказ в WhatsApp</a>
+            <button class="btn-link" id="clear" type="button">Очистить заказ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <h2>О нас</h2>
+      <p id="about-text"></p>
+    </section>
+
+    <section class="section" id="where">
+      <h2>Как нас найти</h2>
+      <div class="card where-card">
+        <p class="where-address" id="address"></p>
+        <div id="hours"></div>
+        <a class="btn btn-dark" id="map-link" target="_blank" rel="noopener">Открыть на карте</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <a data-link="whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+      <a data-link="telegram" target="_blank" rel="noopener">Telegram</a>
+      <a data-link="phone">Позвонить</a>
+    </div>
+    <p class="footer-copy">© <span id="year"></span> <span data-fill="name"></span></p>
+  </footer>
+
+  <script>
+    (function () {
+      // Вспомогательная функция: создаёт элемент с классом и текстом
+      function el(tag, className, text) {
+        const e = document.createElement(tag);
+        if (className) e.className = className;
+        if (text !== undefined) e.textContent = text;
+        return e;
+      }
+      function makeBtn(label, ariaLabel, onClick) {
+        const b = el("button", "round-btn", label);
+        b.type = "button";
+        b.setAttribute("aria-label", ariaLabel);
+        b.addEventListener("click", onClick);
+        return b;
+      }
+      function waLink(text) {
+        return "https://wa.me/" + SETTINGS.whatsapp + (text ? "?text=" + encodeURIComponent(text) : "");
+      }
+
+      /* ----- Название, слоган, ссылки, адрес, график ----- */
+      document.title = SETTINGS.name;
+      document.querySelectorAll("[data-fill='name']").forEach(function (n) {
+        n.textContent = SETTINGS.name;
+      });
+      document.getElementById("slogan").textContent = SETTINGS.slogan;
+      document.getElementById("about-text").textContent = SETTINGS.about;
+      document.getElementById("address").textContent = SETTINGS.address;
+      document.getElementById("year").textContent = new Date().getFullYear();
+      document.getElementById("map-link").href = SETTINGS.mapLink;
+
+      document.querySelectorAll("[data-link]").forEach(function (a) {
+        const type = a.dataset.link;
+        if (type === "whatsapp") a.href = waLink();
+        if (type === "telegram") a.href = SETTINGS.telegram;
+        if (type === "phone") a.href = "tel:" + SETTINGS.phone;
+      });
+
+      const hoursBox = document.getElementById("hours");
+      SETTINGS.hours.forEach(function (row) {
+        const r = el("div", "hours-row");
+        r.appendChild(el("span", "", row[0]));
+        r.appendChild(el("strong", "", row[1]));
+        hoursBox.appendChild(r);
+      });
+
+      /* ----- Меню и корзина ----- */
+      const cart = {};   // ключ: номер позиции, значение: сколько штук
+      const byId = {};   // быстрый поиск позиции по номеру
+
+      const cartList = document.getElementById("cart-list");
+      const cartEmpty = document.getElementById("cart-empty");
+      const cartFooter = document.getElementById("cart-footer");
+      const totalEl = document.getElementById("total");
+      const sendLink = document.getElementById("send-order");
+
+      function changeQty(id, delta) {
+        const next = (cart[id] || 0) + delta;
+        if (next <= 0) delete cart[id]; else cart[id] = next;
+        renderCart();
+      }
+
+      const menuRoot = document.getElementById("menu-root");
+      MENU.forEach(function (group, gi) {
+        const card = el("div", "card");
+        card.appendChild(el("h3", "", group.category));
+        group.items.forEach(function (item, ii) {
+          const id = gi + "-" + ii;
+          byId[id] = item;
+
+          const row = el("div", "menu-item");
+          const name = el("div", "menu-name", item.name);
+          if (item.desc) name.appendChild(el("span", "menu-desc", item.desc));
+          row.appendChild(name);
+          row.appendChild(el("div", "menu-price", item.price + " ₽"));
+          row.appendChild(makeBtn("+", "Добавить в заказ: " + item.name, function () {
+            changeQty(id, 1);
+          }));
+          card.appendChild(row);
+        });
+        menuRoot.appendChild(card);
+      });
+
+      function renderCart() {
+        cartList.innerHTML = "";
+        let total = 0;
+        const lines = [];
+
+        Object.keys(cart).forEach(function (id) {
+          const item = byId[id];
+          const qty = cart[id];
+          const sum = item.price * qty;
+          total += sum;
+          lines.push("• " + item.name + " × " + qty + " — " + sum + " ₽");
+
+          const li = el("li", "cart-row");
+          li.appendChild(el("span", "cart-name", item.name));
+
+          const box = el("div", "qty");
+          box.appendChild(makeBtn("−", "Убрать одну порцию: " + item.name, function () { changeQty(id, -1); }));
+          box.appendChild(el("span", "qty-num", String(qty)));
+          box.appendChild(makeBtn("+", "Добавить ещё: " + item.name, function () { changeQty(id, 1); }));
+          li.appendChild(box);
+
+          li.appendChild(el("span", "cart-sum", sum + " ₽"));
+          cartList.appendChild(li);
+        });
+
+        const hasItems = lines.length > 0;
+        cartEmpty.hidden = hasItems;
+        cartFooter.hidden = !hasItems;
+        totalEl.textContent = total + " ₽";
+
+        if (hasItems) {
+          const text = "Здравствуйте! Хочу заказать с собой:\n" + lines.join("\n") + "\nИтого: " + total + " ₽";
+          sendLink.href = waLink(text);
+        } else {
+          sendLink.removeAttribute("href");
+        }
+      }
+
+      document.getElementById("clear").addEventListener("click", function () {
+        Object.keys(cart).forEach(function (id) { delete cart[id]; });
+        renderCart();
+      });
+
+      renderCart();
+    })();
+  </script>
+</body>
+</html>
