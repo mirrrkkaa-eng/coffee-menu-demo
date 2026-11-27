@@ -15,12 +15,12 @@
       // Фото лежат в одной папке с index.html. Оставь "" — и этот блок скроется.
       // Для галереи можно писать просто имя файла: gallery: ["a.jpg", "b.jpg"]
       photos: {
-        hero: "снаружи.png",
+        hero: "out.png",
         heroAlt: "Терраса кофейни: гости сидят в деревянных шезлонгах под вывеской «Coffee is my love»",
         about: "",
         aboutAlt: "Интерьер кофейни",
         gallery: [
-          { src: "кофе.png", alt: "Стаканчик с логотипом Open Coffee на фоне неоновой вывески" }
+          { src: "coffee.png", alt: "Стаканчик с логотипом Open Coffee на фоне неоновой вывески" }
         ]
       },
 
@@ -104,6 +104,7 @@
     }
     body {
       margin: 0;
+      overflow-x: clip; /* страница не раздвигается вширь */
       background: var(--paper);
       color: var(--ink);
       font: 400 1.0625rem/1.6 var(--sans);
@@ -138,6 +139,7 @@
 
     /* Левая узкая колонка и правая широкая: общая сетка блоков */
     .split { display: grid; gap: 28px; }
+    .split > *, .menu-grid > *, .where-grid > * { min-width: 0; }
     @media (min-width: 900px) {
       .split {
         grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
@@ -170,8 +172,21 @@
     .btn-dark:hover { background: var(--accent); border-color: var(--accent); }
     .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
 
+    /* ============ Фото ============ */
+    /* Высота фото задаётся через --ratio (проценты от ширины). Работает на любых телефонах */
+    .photo { position: relative; margin: 0; overflow: hidden; background: var(--paper-2); }
+    .photo::before { content: ""; display: block; padding-top: var(--ratio, 125%); }
+    .photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     /* ============ Первый экран ============ */
-    .hero { display: grid; background: var(--paper); }
+    .hero { display: grid; overflow: hidden; background: var(--paper); }
+    .hero > * { min-width: 0; }
     .hero-text { padding: clamp(40px, 10vw, 72px) var(--gutter) 36px; align-self: center; }
     .hero h1 {
       margin: 0 0 20px;
@@ -193,12 +208,8 @@
       .hero-buttons .btn-primary { grid-column: 1 / -1; }
     }
 
-    .photo { position: relative; margin: 0; overflow: hidden; background: var(--paper-2); }
-    .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .hero-photo {
-      aspect-ratio: 4 / 5;
-      margin: 12px 0 48px clamp(24px, 8vw, 64px);
-    }
+    /* На телефоне фото идёт от края до края под текстом */
+    .hero-photo { --ratio: 120%; }
     .hero-photo img { object-position: 50% 40%; }
     .hero.no-photo .hero-photo { display: none; }
 
@@ -211,7 +222,8 @@
       .hero.no-photo { grid-template-columns: 1fr; }
       .hero-text { padding: 64px var(--gutter); }
       .hero h1 { font-size: clamp(5.5rem, 9.5vw, 9rem); }
-      .hero-photo { aspect-ratio: auto; min-height: 560px; margin: 0; }
+      .hero-photo { min-height: 560px; }
+      .hero-photo::before { display: none; }
     }
 
     /* ============ Меню ============ */
@@ -222,9 +234,10 @@
     }
     .menu-title { grid-area: title; }
     #menu-root { grid-area: list; }
-    .gallery { grid-area: photo; width: 72%; margin-left: auto; display: grid; gap: 16px; }
+    .gallery { grid-area: photo; display: grid; gap: 16px; max-width: 480px; }
     .gallery:empty { display: none; }
-    .gallery .photo { aspect-ratio: 4 / 5; }
+    .gallery .photo { --ratio: 100%; }
+    .gallery .photo img { object-position: 50% 62%; }
     @media (min-width: 900px) {
       .menu-grid {
         grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
@@ -234,7 +247,8 @@
         row-gap: 32px;
         align-items: start;
       }
-      .gallery { width: 100%; margin-left: 0; position: sticky; top: 24px; }
+      .gallery { max-width: none; position: sticky; top: 24px; }
+      .gallery .photo { --ratio: 125%; }
     }
 
     #menu-root .card {
@@ -374,7 +388,7 @@
       max-width: 30em;
       font: 500 clamp(1.5rem, 3.2vw, 2.1rem)/1.3 var(--serif);
     }
-    .about-photo { aspect-ratio: 4 / 3; margin-top: 32px; max-width: 560px; }
+    .about-photo { --ratio: 75%; margin-top: 32px; max-width: 560px; }
 
     /* ============ Как нас найти ============ */
     .where { background: var(--paper-2); }
